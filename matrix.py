@@ -10,7 +10,7 @@ def string_matrix_from_lines(lines: list) -> np.ndarray:
     return np.matrix(data=m, dtype=str)
 
 def neighbours(matrix: np.ndarray, x: int, y: int) -> list: 
-    x_limit, y_limit = [d - 1 for d in matrix.shape]
+    y_limit, x_limit = [d - 1 for d in matrix.shape]
     neighbours = []
     rows = range(max(0, y - 1), min(y_limit, y + 1) + 1)
     for row in rows:
@@ -22,7 +22,7 @@ def neighbours(matrix: np.ndarray, x: int, y: int) -> list:
     return neighbours
 
 def neighbours_positions(matrix: np.ndarray, x: int, y: int) -> list[tuple[Position]]: 
-    x_limit, y_limit = [d - 1 for d in matrix.shape]
+    y_limit, x_limit = [d - 1 for d in matrix.shape]
     neighbours = []
     rows = range(max(0, y - 1), min(y_limit, y + 1) + 1)
     for row in rows:
