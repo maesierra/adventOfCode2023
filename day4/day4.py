@@ -27,7 +27,7 @@ class Scratchcard():
     
     def get_rewads(self, scratchcards:list) -> list:
         n_matched = self.n_matched()
-        return [Scratchcard(s.id, s.winning_numbers, s.numbers) for s in scratchcards[self.id :min(len(scratchcards), self.id + n_matched)]]
+        return [Scratchcard(s.id, s.winning_numbers, s.numbers) for s in scratchcards[self.id:min(len(scratchcards), self.id + n_matched)]]
 
 class Day4Solution(Solution): 
     def __init__(self) -> None:
@@ -48,7 +48,7 @@ class Day4Solution(Solution):
         scratchcards = self._parse_scratchcards(input)        
         return sum([c.points() for c in scratchcards])
     
-    def solve_part_2(self, input, args):
+    def solve_part_2_v1(self, input, args):
         scratchcards = self._parse_scratchcards(input)    
         unprocessed = [s for s in scratchcards if not s.processed]
         while unprocessed:
@@ -59,6 +59,15 @@ class Day4Solution(Solution):
             unprocessed = [s for s in scratchcards if not s.processed]            
             print(f"Unprocessed: {len(unprocessed)}")
         return len(scratchcards)
+    
+    def solve_part_2(self, input, args):
+        scratchcards = self._parse_scratchcards(input)    
+        cards = {c.id: 1 for c in scratchcards}
+        for card in scratchcards:
+            n_cards = cards[card.id]
+            for r in card.get_rewads(scratchcards):
+                cards[r.id] += n_cards
+        return sum(cards.values())
 
 if __name__ == '__main__':    
     day4 = Day4Solution()

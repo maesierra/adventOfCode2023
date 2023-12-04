@@ -14,8 +14,8 @@ def neighbours(matrix: np.ndarray, x: int, y: int) -> list:
     neighbours = []
     rows = range(max(0, y - 1), min(y_limit, y + 1) + 1)
     for row in rows:
-        colums = range(max(0, x - 1), min(x_limit, x + 1) + 1)
-        for col in colums:
+        columns = range(max(0, x - 1), min(x_limit, x + 1) + 1)
+        for col in columns:
             if col == x and row == y: 
                 continue
             neighbours.append(matrix.item(row, col))
@@ -26,8 +26,8 @@ def neighbours_positions(matrix: np.ndarray, x: int, y: int) -> list[tuple[Posit
     neighbours = []
     rows = range(max(0, y - 1), min(y_limit, y + 1) + 1)
     for row in rows:
-        colums = range(max(0, x - 1), min(x_limit, x + 1) + 1)
-        for col in colums:
+        columns = range(max(0, x - 1), min(x_limit, x + 1) + 1)
+        for col in columns:
             if col == x and row == y: 
                 continue
             neighbours.append(Position(y=row, x=col))
