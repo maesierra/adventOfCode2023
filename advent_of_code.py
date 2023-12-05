@@ -19,6 +19,20 @@ class Solution(ABC):
         with open(input, 'r') as file:
             lines = file.read().splitlines()
         return lines    
+    
+    def group_lines(self, lines: list, delimiter:str = "") -> list:
+        res = []
+        group = []
+        for line in lines:
+            if line == delimiter and group:
+                res.append(group)
+                group = []
+            elif line != delimiter:
+                group.append(line)
+        if group:
+            res.append(group)
+        return res    
+
 
     def run(self, args=[]): 
         parser = argparse.ArgumentParser()
