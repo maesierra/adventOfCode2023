@@ -162,14 +162,26 @@ class Day10Solution(Solution):
         n_columns = len(lines[0])
         for row, line in enumerate(lines):
             count = 0
-            horizontal_rays.append([0]*n_columns)
-            for column, c in enumerate(line):
-                on_loop = f"{row}-{column}" in pipe_map
-                prev_on_loop = f"{row}-{column - 1}" in pipe_map
-                next_on_loop = f"{row}-{column + 1}" in pipe_map
-                if on_loop and (not prev_on_loop or not next_on_loop):
-                    count += 1     
+            horizontal_rays.append([0]*n_columns)            
+            corner = None
+            column = 0
+            for column in range(0, n_columns):
+                pipe = pipe_map.get(f"{row}-{column}", None)
+                if pipe: 
+                    # | always switch 
+                    if pipe.shape == '|':
+                        count += 1
+                    # ╔	╝ (FJ) or ╚	╗(L7) are convex corners that will switch 
+                    # ╔	╗ (F7) or ╚╝(LJ) are concanve corners that will not switch
+                    elif pipe.shape in ['F', 'L'] and not corner: 
+                        corner = pipe.shape
+                    elif corner and pipe.shape in ['J', '7']:
+                        if (corner == 'F' and pipe.shape == 'J') or (corner == 'L' and pipe.shape == '7'):
+                            count += 1
+                        corner = False                            
+                # - and . can be ignored as they don't change
                 horizontal_rays[row][column] = count
+                
 
         enclosed = 0
         for row, line in enumerate(lines):
