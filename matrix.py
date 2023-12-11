@@ -33,3 +33,5 @@ def neighbours_positions(matrix: np.ndarray, x: int, y: int) -> list[tuple[Posit
             neighbours.append(Position(y=row, x=col))
     return neighbours
 
+def column(array:list, column:int) -> list:
+    return [array[row][column] for row in range(0, len(array))]
