@@ -6,6 +6,7 @@ class Solution(ABC):
     def __init__(self, day) -> None:
         super().__init__()
         self.day = day
+        self.debug = False
 
     @abstractmethod
     def solve_part_1(self, input, args=[]): 

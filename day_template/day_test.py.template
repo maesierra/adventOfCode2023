@@ -17,6 +17,7 @@ class Day${day}SolutionTest(unittest.TestCase):
 """ 
         with text_to_input(lines) as input: 
             solver = Day${day}Solution()
+            solver.debug = True
             solution = solver.solve_part_1(input, [])
             self.assertEqual(solution, 1)
 
@@ -25,6 +26,7 @@ class Day${day}SolutionTest(unittest.TestCase):
 """ 
         with text_to_input(lines) as input: 
             solver = Day${day}Solution()
+            solver.debug = True
             solution = solver.solve_part_2(input, [])
             self.assertEqual(solution, 2)
 
