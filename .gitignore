@@ -3,3 +3,4 @@ __pycache__/
 .vscode/
 out
 .~lock.helper.xlsx#
+.idea
