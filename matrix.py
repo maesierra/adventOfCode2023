@@ -35,3 +35,10 @@ def neighbours_positions(matrix: np.ndarray, x: int, y: int) -> list[tuple[Posit
 
 def column(array:list, column:int) -> list:
     return [array[row][column] for row in range(0, len(array))]
+
+def in_grid(grid:list, pos:Position) -> bool:
+    n_rows, n_cols = dimensions(grid)
+    return pos.x >= 0 and pos.x < n_cols and pos.y >= 0 and pos.y < n_rows
+
+def dimensions(grid:list) -> tuple:
+    return (len(grid), len(grid[0]))
