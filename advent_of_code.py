@@ -35,7 +35,7 @@ class Solution(ABC):
         return res    
 
 
-    def run(self, args=[]): 
+    def run(self, input_args=[]): 
         parser = argparse.ArgumentParser()
         parser.add_argument('part', nargs='?', default=1)
         parser.add_argument('input', nargs='?', default=f"input_{self.day}")
@@ -44,9 +44,9 @@ class Solution(ABC):
 
         print (f"Day {self.day} Part {args.part} Input {args.input}")
         if int(args.part) == 1: 
-            solution = self.solve_part_1(input=input_file, args=args)
+            solution = self.solve_part_1(input=input_file, args=input_args)
         else: 
-            solution = self.solve_part_2(input=input_file, args=args)
+            solution = self.solve_part_2(input=input_file, args=input_args)
         print(f"Solution: {solution}")        
         
 

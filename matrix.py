@@ -5,6 +5,12 @@ class Position():
         self.x = x
         self.y = y
 
+    def clone(self, x: int = None, y: int = None) -> "Position":
+        return Position(x=x if x is not None else self.x, y=y if y is not None else self.y)
+    
+    def __str__(self) -> str:
+        return f"{self.y},{self.x}"
+
 def string_matrix_from_lines(lines: list) -> np.ndarray:
     m = [[char for char in l] for l in lines]
     return np.matrix(data=m, dtype=str)
