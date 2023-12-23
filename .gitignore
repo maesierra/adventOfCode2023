@@ -4,3 +4,4 @@ __pycache__/
 out
 .~lock.helper.xlsx#
 .idea
+day22/day22.py
