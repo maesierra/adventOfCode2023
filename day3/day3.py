@@ -66,7 +66,7 @@ class Day3Solution(Solution):
         return False    
 
 
-    def solve_part_1(self, input, args):        
+    def solve_part_1(self, input, args):
         m = matrix.string_matrix_from_lines(self.input_to_lines(input))  
         part_numbers = self._parse_part_numbers(m)
         return sum([int(p.number) for p in part_numbers])

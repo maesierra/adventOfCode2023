@@ -88,7 +88,7 @@ class Day7Solution(Solution):
         sorted_bids = [h[1] for h in hands]
         return sum([bid * (rank + 1) for rank,bid in enumerate(sorted_bids)])
     
-    def solve_part_1(self, input, args):        
+    def solve_part_1(self, input, args):
         hands = self._parse_hands(input=input, jokers=False)
         return self._calculate_winnings(hands)
 

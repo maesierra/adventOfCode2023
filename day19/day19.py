@@ -136,7 +136,7 @@ class Day19Solution(Solution):
         block1, block2 = self.group_lines(self.input_to_lines(input))
         return (self._parse_workflows(block1), self._parse_parts(block2))
 
-    def solve_part_1(self, input, args):        
+    def solve_part_1(self, input, args):
         global debug
         debug = self.debug
         workflows, parts = self._parse(input)

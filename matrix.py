@@ -10,6 +10,12 @@ class Position():
     
     def __str__(self) -> str:
         return f"{self.y},{self.x}"
+    
+    def __eq__(self, other: object) -> bool:
+        return self.x == other.x and self.y == other.y
+    
+    def __hash__(self) -> int:
+        return hash((self.x, self.y))
 
 def string_matrix_from_lines(lines: list) -> np.ndarray:
     m = [[char for char in l] for l in lines]
