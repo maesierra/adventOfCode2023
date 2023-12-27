@@ -1,7 +1,8 @@
+import math
 import os
 import sys
 import re
-from math import gcd
+from typing import Dict, Tuple
 
 root_folder = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(root_folder)
@@ -73,7 +74,7 @@ class Day8Solution(Solution):
     def __init__(self) -> None:
         super().__init__(8)
 
-    def _parse_nodes(self, lines):
+    def _parse_nodes(self, lines) -> Dict[str, Node]:
         nodes = {}
         for l in lines:
             match = re.search(r"([A-Z0-9]+) = \(([A-Z0-9]+), ([A-Z0-9]+)\)", l)
@@ -84,7 +85,7 @@ class Day8Solution(Solution):
             node.connect(left=left, right=right)
         return nodes
             
-    def _parse(self, input) -> tuple: 
+    def _parse(self, input) -> Tuple[Dict[str, Node], Instructions]: 
         lines = self.input_to_lines(input)
         nodes = self._parse_nodes(lines[2:])                
         instructions = Instructions(line=lines[0])
@@ -114,65 +115,16 @@ class Day8Solution(Solution):
             if n.node.group == 'Z':
                 # Lame hack. The solution has only one Z in the loop, but the test input has 2 and the valid is the second
                 end = i
-        return Loop(node=path[end].node, position=end, size=len(path))        
+        return Loop(node=path[end].node, position=end + 1, size=len(path) + 1)        
         
     
-
-    
-    def solve_part_2_v1(self, input, args):
-        nodes, instructions = self._parse(input)
-        nodes = nodes.values()
-        current = [n for n in nodes if n.group == 'A']
-        destination_group = set(['Z'])
-        pos = 0
-        n_instructions = len(instructions)
-        steps = 0
-        while set([n.group for n in current]) != destination_group:
-            movement = instructions[pos]
-            print(f"Step {steps}. {[n.name for n in current]} {movement} => ", end = "")        
-            current = [n.move(movement) for n in current]
-            print(f"{[n.name for n in current]}")        
-            pos = (pos + 1) % n_instructions
-            steps += 1
-        return steps
-    
-    
-    def lcm(self, a,b):
-        return a*b // gcd(a,b)
-
     def  solve_part_2(self, input, args):
         nodes, instructions = self._parse(input)
         loops = [self._calculate_loop(node=n, instructions=instructions) for n in nodes.values() if n.group == 'A']
         if self.debug:
-            print([str(l) for l in loops])
-        current = [l.position for l in loops]        
-        lowest = sorted(current)[0]
-        lcm = 1
-        for l in loops:
-            lcm = self.lcm(lcm, l.size)
-            print(f"hiii...{lcm}")
-        print ("holi")
-        return lowest + lcm - 1
-        # while True:
-        #     # get the lowest position
-        #     lowest_pos = None
-        #     lowest_idx = None
-        #     for i, pos in enumerate(current):
-        #         if lowest_pos == None or pos < lowest_pos:
-        #             lowest_pos = pos
-        #             lowest_idx = i
-        #     if self.debug:
-        #         print(f"{current} Increasing {lowest_idx} by {loops[lowest_idx].size}")
-        #     current[lowest_idx] += loops[lowest_idx].size
-        #     if self.debug:
-        #         print(f"{current}")
-        #     # Check if all are at the same position
-        #     value = current[0]
-        #     for pos in current:
-        #         if value != pos:
-        #             value = None
-        #     if value: 
-        #         return value + 1
+            print([(l.node.name, l.position, l.size) for l in loops])
+        return math.lcm(*[l.position for l in loops])
+        
             
 
 if __name__ == '__main__':    
