@@ -1,6 +1,8 @@
+from collections import deque
 import os
 import sys
-from typing import List, Tuple
+from typing import Deque, List, Tuple
+from z3 import Int, Solver, unsat, unknown
 
 
 root_folder = os.path.abspath(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,7 +20,11 @@ class Hailstone():
         self.p1:Tuple[int,int, int] = (x, y, z)
         self.p2:Tuple[int,int, int] = (x + self.dx, y + self.dy, z + self.dz)
 
-    def position_in_past(self, pos:Tuple[float, float]) -> bool:
+    def at(self, t:int) -> Tuple[int, int, int]:
+        x, y, z = self.p1
+        return (x + (self.dx * t), y + (self.dy * t), z + (self.dz * t))
+
+    def position_2d_in_past(self, pos:Tuple[float, float]) -> bool:
         x, y = pos
         if self.dx < 0 and x > self.p1[0]: 
             return True
@@ -30,7 +36,7 @@ class Hailstone():
             return True
         return False
 
-    def intersect(self, other:"Hailstone") -> Tuple[float, float]:
+    def intersect_2d(self, other:"Hailstone") -> Tuple[float, float]:
         a1 = self.p2[1] - self.p1[1] 
         b1 = self.p1[0] - self.p2[0] 
         c1 = a1*(self.p1[0]) + b1*(self.p1[1])
@@ -64,7 +70,7 @@ class Day24Solution(Solution):
             for b in hailstones[i + 1:]:
                 if self.debug:
                     print(f"Intersecting {a} / {b} => ", end="")
-                intersection = a.intersect(b)
+                intersection = a.intersect_2d(b)
                 if intersection is None:
                     if self.debug:
                         print(f"parallel")
@@ -75,17 +81,57 @@ class Day24Solution(Solution):
                         print(f"{intersection} outside of area")
                     # outside of the area
                     continue
-                if a.position_in_past(intersection) or b.position_in_past(intersection):
+                if a.position_2d_in_past(intersection) or b.position_2d_in_past(intersection):
                     # intersection is in the past
-                    print(f"{intersection} in the past (a: {a.position_in_past(intersection)}, b: {b.position_in_past(intersection)})")
+                    print(f"{intersection} in the past (a: {a.position_2d_in_past(intersection)}, b: {b.position_2d_in_past(intersection)})")
                     continue
                 res += 1                
         return res
     
     def solve_part_2(self, input, args):
-        lines = self.input_to_lines(input)
-        print(lines)
-        return 2
+        hailstones:List[Hailstone] = [Hailstone(l) for l in self.input_to_lines(input)]
+
+        x = Int('x')
+        y = Int('y')
+        z = Int('z')
+        dx = Int('dx')
+        dy = Int('dy')
+        dz = Int('dz')
+        t1 = Int('t1')
+        t2 = Int('t2')
+        t3 = Int('t3')
+        
+        solver = Solver()
+        
+        # time must be positive
+        solver.add(t1 >= 0)
+        h = hailstones[0]
+        hx, hy, hz = h.p1
+        solver.add(x + t1 * dx == hx + t1 * h.dx)
+        solver.add(y + t1 * dy == hy + t1 * h.dy)
+        solver.add(z + t1 * dz == hz + t1 * h.dz)
+
+        solver.add(t2 >= 0)
+        h = hailstones[1]
+        hx, hy, hz = h.p1
+        solver.add(x + t2 * dx == hx + t2 * h.dx)
+        solver.add(y + t2 * dy == hy + t2 * h.dy)
+        solver.add(z + t2 * dz == hz + t2 * h.dz)
+
+        solver.add(t3 >= 0)
+        h = hailstones[2]
+        hx, hy, hz = h.p1
+        solver.add(x + t3 * dx == hx + t3 * h.dx)
+        solver.add(y + t3 * dy == hy + t3 * h.dy)
+        solver.add(z + t3 * dz == hz + t3 * h.dz)
+
+
+        res = solver.check()
+        if res != unsat or unknown:
+            solution = solver.model()
+            return solution[x].as_long() + solution[y].as_long() + solution[z].as_long()
+        else:
+            raise Exception(f"No solution {res}")
 
 if __name__ == '__main__':    
     day24 = Day24Solution()

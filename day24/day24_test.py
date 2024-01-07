@@ -29,7 +29,7 @@ class Day24SolutionTest(unittest.TestCase):
         for line1, line2, expected in test_cases:
             a = Hailstone(line1)
             b = Hailstone(line2)
-            res = a.intersect(b)
+            res = a.intersect_2d(b)
             if expected == None: 
                 self.assertIsNone(res)
             else: 
@@ -49,13 +49,16 @@ class Day24SolutionTest(unittest.TestCase):
             self.assertEqual(solution, 2)
 
     def test_part2(self):
-        lines = """
-""" 
+        lines = """19, 13, 30 @ -2,  1, -2
+18, 19, 22 @ -1, -1, -2
+20, 25, 34 @ -2, -2, -4
+12, 31, 28 @ -1, -2, -1
+20, 19, 15 @  1, -5, -3""" 
         with text_to_input(lines) as input: 
             solver = Day24Solution()
             solver.debug = True
-            solution = solver.solve_part_2(input, [])
-            self.assertEqual(solution, 2)
+            solution = solver.solve_part_2(input, [(7, 27)])
+            self.assertEqual(solution, 47)
 
 
 if __name__ == '__main__':
