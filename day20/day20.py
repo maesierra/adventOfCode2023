@@ -1,4 +1,4 @@
-from doctest import debug
+import math
 import os
 import re
 import sys
@@ -26,14 +26,17 @@ class Board():
     def push_button(self):
         self.low_pulses += 1
         self.modules["broadcaster"].receive(pulse=False, input=None)
-        while self.queue:            
+        self.process_pulses()
+
+    def process_pulses(self):
+        while self.queue:
             pulse, from_module, to_module = self.queue.pop(0)
             to_module.receive(pulse=pulse, input=from_module)
             if pulse:
                 self.high_pulses += 1
             else: 
                 self.low_pulses += 1
-            self.history[to_module.name]['high' if pulse else 'low'] += 1            
+            self.history[to_module.name]['high' if pulse else 'low'] += 1
 
     def state(self) -> str:
         return [m.state() for m in self.modules.values()]
@@ -44,7 +47,7 @@ class Board():
         if not src_module:
             return
         if not dest_module:
-            dest_module = Module(name=dest, inputs=[], outputs=[], board=None)
+            dest_module = Module(name=dest)
             self.add_module(dest_module)
 
         src_module.add_output(dest_module)
@@ -56,21 +59,22 @@ class Board():
 
 
 class Module():
-    def __init__(self, name:str, inputs:list["Module"]=[], outputs:list["Module"]=[], board:Board = None) -> None:
-        self.outputs = outputs
-        self.inputs = inputs
+    def __init__(self, name:str) -> None:
+        self.outputs:List["Module"] = []
+        self.inputs:List["Module"] = []        
+        self.board:Board = None
         self.name = name
-        self.board = board
+        self.sent = {True: 0, False: 0}
+        self.received = {True: 0, False: 0}
 
-    def send(self, pulse:bool):
-        global debug
+    def send(self, pulse:bool):        
         for module in self.outputs:
-            if debug:
-                print(f"{'high' if pulse else 'low'} pulse from {self.name} to {module.name}")            
-            self.board.send_pulse(pulse=pulse, from_module=self, to_module=module)
+            # print(f"{'high' if pulse else 'low'} pulse from {self.name} to {module.name}")            
+            self.board.send_pulse(pulse=pulse, from_module=self, to_module=module)            
+        self.sent[pulse] += 1
 
     def receive(self, input:"Module", pulse:bool):
-        pass
+        self.received[pulse] += 1
 
     def state(self) -> str:
         return ""
@@ -82,18 +86,24 @@ class Module():
         self.inputs.append(input)
 
 class Broadcast(Module):
-    def __init__(self, name:str, inputs:list["Module"]=[], outputs:list["Module"]=[]) -> None:
-        super().__init__(name=name, inputs=inputs, outputs=outputs)
+    def __init__(self, name:str) -> None:
+        super().__init__(name=name)
 
     def receive(self, input:"Module", pulse:bool):
+        super().receive(input, pulse)
         self.send(pulse)
 
-class FlipFlow(Module):
-    def __init__(self, name:str,inputs:list["Module"]=[], outputs:list["Module"]=[]) -> None:
-        super().__init__(name=name, inputs=inputs, outputs=outputs)
+class Receiver(Module):
+    def __init__(self, name:str) -> None:
+        super().__init__(name=name)
+
+class FlipFlop(Module):
+    def __init__(self, name:str) -> None:
+        super().__init__(name=name)
         self.on = False
     
     def receive(self, input:"Module", pulse:bool):
+        super().receive(input, pulse)
         # ignores high pulses
         if pulse:
             return
@@ -106,11 +116,12 @@ class FlipFlow(Module):
         return f"{self.name}:{'on' if self.on else 'off'}"
 
 class Conjunction(Module):
-    def __init__(self, name:str,inputs:list["Module"]=[], outputs:list["Module"]=[]) -> None:
-        super().__init__(name=name, inputs=inputs, outputs=outputs)
-        self.memory = [0 for i in inputs]
+    def __init__(self, name:str) -> None:
+        super().__init__(name=name)
+        self.memory = []
 
     def receive(self, input:"Module", pulse:bool):
+        super().receive(input, pulse)
         for i, module in enumerate(self.inputs):
             if input == module:
                 self.memory[i] = 1 if pulse else 0
@@ -139,11 +150,13 @@ class Day20Solution(Solution):
             module_name = m.group(2)
             module_type = m.group(1)
             if module_type == "%":
-                module = FlipFlow(name=module_name, inputs=[], outputs=[])
+                module = FlipFlop(name=module_name)
             elif module_type == "&":
-                module = Conjunction(name=module_name, inputs=[], outputs=[])
+                module = Conjunction(name=module_name)
             elif module_name == "broadcaster":
-                module = Broadcast(name=module_name, inputs=[], outputs=[])
+                module = Broadcast(name=module_name)
+            elif module_name == "rx":
+                module = Receiver(name=module_name)
             board.add_module(module)
             connections[module_name] = m.group(3).split(", ")
 
@@ -180,18 +193,26 @@ class Day20Solution(Solution):
         return board.low_pulses * board.high_pulses
 
     def solve_part_1(self, input, args):
-        global debug
-        debug = self.debug
         board = self._parse_board(input)
         return self._send_button_pushes(board, 1000)
     
+        
     def solve_part_2(self, input, args):
-        global debug
-        debug = self.debug
         board = self._parse_board(input)
-        self._send_button_pushes(board, 1000000)
-        print(board.history)
-        return 2
+        #These are the "key" modules. The hold a big number of chained inputs. 
+        modules = [board.modules['ck'], board.modules['hh'], board.modules['ns'], board.modules['kz']]
+        cycles = {}
+        n_pushes = 0
+        while len(cycles) != len(modules): 
+            n_pushes += 1
+            board.push_button()
+            for m in modules:
+                if not m.name in cycles and m.sent[False] > 0:
+                    cycles[m.name] = n_pushes
+        
+        return math.lcm(*[v for v in cycles.values()])
+                
+
 
 if __name__ == '__main__':    
     day20 = Day20Solution()

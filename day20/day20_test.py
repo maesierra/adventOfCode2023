@@ -37,5 +37,12 @@ class Day20SolutionTest(unittest.TestCase):
             self.assertEqual(solution, 11687500)
 
 
+    def test_part2_real_input(self):
+        input_file = os.path.join(os.path.dirname(__file__), "../", "input_20")
+        solver = Day20Solution()
+        solver.debug = False
+        solution = solver.solve_part_2(input_file, [])
+        self.assertGreater(solution, 0)
+
 if __name__ == '__main__':
     unittest.main()
