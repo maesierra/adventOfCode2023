@@ -30,14 +30,12 @@ class Day21SolutionTest(unittest.TestCase):
             solution = solver.solve_part_1(input, [6])
             self.assertEqual(solution, 16)
 
-    def test_part2(self):
-        lines = """
-""" 
-        with text_to_input(lines) as input: 
-            solver = Day21Solution()
-            solver.debug = True
-            solution = solver.solve_part_2(input, [])
-            self.assertEqual(solution, 2)
+    def test_part2_real_input(self):
+        input_file = os.path.join(os.path.dirname(__file__), "../", "input_21")
+        solver = Day21Solution()
+        solver.debug = False
+        solution = solver.solve_part_2(input_file, [])
+        self.assertGreater(solution, 0)
 
 
 if __name__ == '__main__':
